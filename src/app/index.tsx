@@ -1,85 +1,123 @@
-import Button from "@/components/Button";
-import Input from "@/components/Input";
-import { Link } from "expo-router";
 import { useState } from "react";
-import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+
+const LOGO = require("@/assets/logo.png");
 
 export default function Index() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+    const [email, setEmail] = useState("");
+    const [senha, setSenha] = useState("");
+    const [mostrarSenha, setMostrarSenha] = useState(false);
 
-  async function handleLogin() {
-    console.log(email, senha);
-  }
+    return (
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.select({ ios: "padding", android: "height"})}
+        >
+            <ScrollView
+                contentContainerStyle={{ flexGrow: 1 }}
+                keyboardShouldPersistTaps="handled"
+            >
+                <View style={styles.container}>
+                    <Image style={styles.logo} source={LOGO} />
+                    <View style={styles.divider} />
+                    <Text style={styles.title}>Entre na sua Conta</Text>
+                
+                    <View style={styles.fieldGroup}>
+                        <Text style={styles.label}>Email</Text>
+                        <TextInput 
+                            style={styles.input} 
+                            value={email}
+                            onChangeText={setEmail}
+                            placeholder="Digite o seu e-mail"
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                        />
+                    </View>
 
-  return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.select({ ios: "padding", android: "height" })}
-    >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.container}>
-          <Image source={require("@/assets/person1.png")} style={styles.logo} />
-          <Text style={styles.title}>Entrar</Text>
-          <Text style={styles.subtitle}>
-            Acesse sua conta utilizando e-mail e senha.
-          </Text>
-
-          <View style={styles.form}>
-            <Input
-              placeholder="E-mail"
-              keyboardType="email-address"
-              onChangeText={setEmail}
-            />
-            <Input
-              placeholder="Senha"
-              secureTextEntry
-              onChangeText={setSenha}
-            />
-            <Button label="Entrar" onPress={() => handleLogin()} />
-            <Text style={styles.register}>
-              Não tem conta? <Link href="/cadastro">Cadastre-se</Link>
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+                    <View style={styles.fieldGroup}>
+                        <Text style={styles.label}>Senha</Text>
+                        <View style={styles.inputGroup}>
+                            <TextInput 
+                                style={[styles.input, styles.inputFlex]} 
+                                value={senha}
+                                onChangeText={setSenha}
+                                placeholder="Digite a sua senha"
+                                autoCapitalize="none"
+                                
+                            />
+                            <Pressable
+                                style={styles.eyeButton}
+                                onPress={() => setMostrarSenha(v => !v)}
+                            >
+                                <Text style={styles.eyeText}>{mostrarSenha ? "🙈" : "👁️"}</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
+    )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 32,
-  },
-  logo: {
-    width: "100%",
-    height: 300,
-    resizeMode: "contain",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 700,
-    // textAlign: "center",
-  },
-  subtitle: {},
-  form: {
-    flex: 1,
-    gap: 16,
-    marginTop: 32,
-  },
-  register: {
-    textAlign: "center",
-  },
-});
+    container: {
+        flex: 1,
+        padding: 32,
+        justifyContent: "center",
+        gap: 24,
+        backgroundColor: "#00000050"
+    },
+    logo: {
+        width: 145,
+        height: 33,
+        marginHorizontal: "auto",
+        resizeMode: "contain"
+    },
+    divider: {
+        height: 1,
+        backgroundColor: "#D0D5DD",
+        width: "100%"
+    },
+    title: {
+        textAlign: "center",
+        color: "#101828",
+        fontSize: 31,
+        fontWeight: 600,
+        lineHeight: 36
+    },
+    fieldGroup: {
+        marginBottom: 10
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: 500,
+        color: "#101828",
+        marginBottom: 6
+    },
+    input: {
+        width: "100%",
+        borderWidth: 1,
+        borderColor: "#D0D5DD",
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        fontSize: 14,
+        color: "#101828",
+    },
+    inputFlex: {
+        flex: 1,
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+    },
+    inputGroup: {
+        flexDirection:  "row",
+        alignItems: "center"
+    },
+    eyeButton: {
+
+    },
+    eyeText: {
+
+    }
+})
