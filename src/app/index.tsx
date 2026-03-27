@@ -8,6 +8,8 @@ export default function Index() {
     const [senha, setSenha] = useState("");
     const [mostrarSenha, setMostrarSenha] = useState(false);
 
+
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -54,6 +56,20 @@ export default function Index() {
                             </Pressable>
                         </View>
                     </View>
+
+                    <Pressable style={[styles.loginButton]}>
+                        <Text style={styles.textLogin}>Entrar</Text>
+                    </Pressable>
+
+                
+                    <Pressable style={styles.cadastroButton}>
+                        <Text style={styles.cadastroButtonText}>Cadastra-se</Text>
+                    </Pressable>
+                   
+
+                    <Pressable>
+                        <Text style={styles.forgotText}>Esqueceu sua senha?</Text>
+                    </Pressable>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -66,7 +82,7 @@ const styles = StyleSheet.create({
         padding: 32,
         justifyContent: "center",
         gap: 24,
-        backgroundColor: "#00000050"
+        // backgroundColor: "#00000050"
     },
     logo: {
         width: 145,
@@ -126,5 +142,35 @@ const styles = StyleSheet.create({
     },
     eyeText: {
         fontSize: 16
+    },
+    loginButton: {
+        backgroundColor: "#1e2533",
+        borderRadius: 8,
+        paddingVertical: 13,
+        alignItems: "center",
+        marginBottom: 12
+    },
+    textLogin: {
+        color: "#FFF",
+        fontSize: 16,
+        fontWeight: 600
+    },
+    cadastroButton: {
+        borderWidth: 1,
+        borderRadius: 8,
+        paddingVertical: 13,
+        alignItems: "center",
+        marginBottom: 16
+    },
+    cadastroButtonText: {
+        color: "#1e2533",
+        fontSize: 16,
+        fontWeight: 600
+    },
+    forgotText: {
+        textAlign: "center",
+        color: "#1e2533",
+        fontSize: 13,
+        textDecorationLine: "underline"
     }
 })
