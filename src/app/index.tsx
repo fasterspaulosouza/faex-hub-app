@@ -43,8 +43,8 @@ export default function Index() {
                                 value={senha}
                                 onChangeText={setSenha}
                                 placeholder="Digite a sua senha"
+                                secureTextEntry={!mostrarSenha}
                                 autoCapitalize="none"
-                                
                             />
                             <Pressable
                                 style={styles.eyeButton}
@@ -115,9 +115,16 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     eyeButton: {
-
+        borderWidth: 1,
+        borderColor: "#e2e8f0",
+        borderLeftWidth: 0,
+        borderTopRightRadius: 8,
+        borderBottomRightRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        backgroundColor: "#FFF"
     },
     eyeText: {
-
+        fontSize: 16
     }
 })
