@@ -1,4 +1,5 @@
 import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
 import { useState } from "react";
 import {
   Image,
@@ -67,6 +68,9 @@ export default function Index() {
               </Pressable>
             </View>
           </View>
+
+          <Input placeholder="Digite o seu e-mail" />
+          <Input placeholder="Digite a sua senha" showToggle={true} />
 
           <Button label="Entrar" variant="primary" />
           <Button label="Cadastra-se" variant="outline" />
