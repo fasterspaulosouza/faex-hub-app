@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: 500,
+    fontFamily: "Inter_Inter_500Medium",
     color: "#101828",
   },
 });

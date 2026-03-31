@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
     padding: 32,
     justifyContent: "center",
     gap: 24,
+    backgroundColor: "#FFF",
   },
   logo: {
     width: 145,
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#101828",
     fontSize: 31,
-    fontWeight: 600,
+    fontFamily: "LexendDeca_700Bold",
     lineHeight: 36,
   },
 });

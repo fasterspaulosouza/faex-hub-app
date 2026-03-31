@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   ghost: {},
   text: {
     fontSize: 16,
-    fontWeight: 600,
+    fontFamily: "Inter_Inter_500Medium",
   },
   primaryText: {
     color: "#FFF",

@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
+    fontFamily: "Inter_400Regular",
     color: "#101828",
   },
   inputFlex: {
