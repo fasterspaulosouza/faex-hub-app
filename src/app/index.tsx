@@ -2,7 +2,6 @@ import { Button } from "@/components/Button";
 import { FormField } from "@/components/formField";
 import { useState } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -10,8 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-
-const LOGO = require("@/assets/logo.png");
+import Logo from "@/assets/logo_black.svg";
 
 export default function Index() {
   const [email, setEmail] = useState("");
@@ -27,7 +25,7 @@ export default function Index() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.container}>
-          <Image style={styles.logo} source={LOGO} />
+          <Logo width={165} height={53} style={styles.logo} />
 
           <View style={styles.divider} />
 
@@ -69,10 +67,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   logo: {
-    width: 145,
-    height: 33,
-    marginHorizontal: "auto",
-    resizeMode: "contain",
+    alignSelf: "center",
   },
   divider: {
     height: 1,
