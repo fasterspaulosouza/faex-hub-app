@@ -4,6 +4,7 @@ export const Colors = {
   border: "#D0D5DD",
   white: "#FFF",
   black: "#000",
+  icon: "#9CA3AF",
 } as const;
 
 export const Fonts = {

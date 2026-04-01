@@ -9,6 +9,8 @@ import {
   View,
 } from "react-native";
 
+import { Ionicons } from "@expo/vector-icons";
+
 type Props = TextInputProps & {
   showToggle?: boolean;
 };
@@ -25,7 +27,7 @@ export function Input({
     return (
       <View style={styles.row}>
         <TextInput
-          style={[styles.input, styles.inputFlex, style]}
+          style={[styles.input, styles.inputWithIcon, style]}
           secureTextEntry={!visible}
           autoCapitalize="none"
           {...rest}
@@ -34,7 +36,11 @@ export function Input({
           style={styles.eyeButton}
           onPress={() => setVisible((v) => !v)}
         >
-          <Text style={styles.eyeText}>{visible ? "🙈" : "👁️"}</Text>
+          <Ionicons
+            name={visible ? "eye-off-outline" : "eye-outline"}
+            size={20}
+            color={Colors.icon}
+          />
         </Pressable>
       </View>
     );
@@ -64,22 +70,12 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body.regular,
     color: Colors.text,
   },
-  inputFlex: {
-    flex: 1,
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
+  inputWithIcon: {
+    paddingRight: 44,
   },
   eyeButton: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderLeftWidth: 0,
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: Colors.white,
-  },
-  eyeText: {
-    fontSize: 16,
+    position: "absolute",
+    padding: 4,
+    right: 12,
   },
 });
