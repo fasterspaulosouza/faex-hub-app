@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import Logo from "@/assets/logo_black.svg";
+import { Colors, Fonts } from "@/constants/theme";
 
 export default function Index() {
   const [email, setEmail] = useState("");
@@ -64,21 +65,21 @@ const styles = StyleSheet.create({
     padding: 32,
     justifyContent: "center",
     gap: 24,
-    backgroundColor: "#FFF",
+    backgroundColor: Colors.white,
   },
   logo: {
     alignSelf: "center",
   },
   divider: {
     height: 1,
-    backgroundColor: "#D0D5DD",
+    backgroundColor: Colors.border,
     width: "100%",
   },
   title: {
     textAlign: "center",
-    color: "#101828",
+    color: Colors.text,
     fontSize: 31,
-    fontFamily: "LexendDeca_700Bold",
+    fontFamily: Fonts.title.bold,
     lineHeight: 36,
   },
 });

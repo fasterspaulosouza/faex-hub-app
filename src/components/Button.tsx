@@ -1,3 +1,4 @@
+import { Colors, Fonts } from "@/constants/theme";
 import { Pressable, PressableProps, StyleSheet, Text } from "react-native";
 
 type Variant = "primary" | "outline" | "ghost";
@@ -22,25 +23,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   primary: {
-    backgroundColor: "#1e2533",
+    backgroundColor: Colors.primary,
   },
   outline: {
     borderWidth: 1,
-    borderColor: "#1e2533",
+    borderColor: Colors.primary,
   },
   ghost: {},
   text: {
     fontSize: 16,
-    fontFamily: "Inter_Inter_500Medium",
+    fontFamily: Fonts.body.semiBold,
   },
   primaryText: {
-    color: "#FFF",
+    color: Colors.white,
   },
   outlineText: {
-    color: "#1e2533",
+    color: Colors.primary,
   },
   ghostText: {
-    color: "#1e2533",
+    color: Colors.primary,
     fontSize: 13,
     textDecorationLine: "underline",
   },

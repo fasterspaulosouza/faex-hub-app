@@ -1,3 +1,4 @@
+import { Colors, Fonts } from "@/constants/theme";
 import { useState } from "react";
 import {
   Pressable,
@@ -56,12 +57,12 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: Colors.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontFamily: "Inter_400Regular",
-    color: "#101828",
+    fontFamily: Fonts.body.regular,
+    color: Colors.text,
   },
   inputFlex: {
     flex: 1,
@@ -70,13 +71,13 @@ const styles = StyleSheet.create({
   },
   eyeButton: {
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: Colors.border,
     borderLeftWidth: 0,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: "#FFF",
+    backgroundColor: Colors.white,
   },
   eyeText: {
     fontSize: 16,
