@@ -15,6 +15,7 @@ import { maskCEP, maskCPF, maskDate, maskPhone } from "@/utils/masks";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { StepIndicator } from "@/components/StepIndicator";
+import RadioGroup from "@/components/RadioGroup";
 
 const SEXO_OPTIONS = ["Masculino", "Feminino"];
 
@@ -84,7 +85,6 @@ export default function CadastroScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
       >
         <View style={styles.card}>
           <Logo width={165} height={53} style={styles.logo} />
@@ -102,7 +102,7 @@ export default function CadastroScreen() {
               />
 
               {/* Provisório */}
-              <View style={styles.sexoRow}>
+              {/* <View style={styles.sexoRow}>
                 {SEXO_OPTIONS.map((opc) => (
                   <Pressable
                     key={opc}
@@ -122,6 +122,11 @@ export default function CadastroScreen() {
                     </Text>
                   </Pressable>
                 ))}
+              </View> */}
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Sexo</Text>
+                <RadioGroup value={sexo} onChange={setSexo} />
               </View>
 
               <FormField
@@ -258,28 +263,36 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.title.bold,
     lineHeight: 36,
   },
-  sexoRow: {
-    flexDirection: "row",
-    gap: 8,
+  // sexoRow: {
+  //   flexDirection: "row",
+  //   gap: 8,
+  // },
+  // sexoOption: {
+  //   flex: 1,
+  //   borderWidth: 1,
+  //   borderColor: Colors.border,
+  //   borderRadius: 8,
+  //   paddingVertical: 8,
+  //   alignItems: "center",
+  // },
+  // sexoOptionActive: {
+  //   borderColor: Colors.primary,
+  //   backgroundColor: Colors.indigo,
+  // },
+  // sexoText: {
+  //   fontSize: 13,
+  //   color: Colors.text,
+  //   fontFamily: Fonts.body.regular,
+  // },
+  // sexoTextActive: {
+  //   fontFamily: Fonts.body.bold,
+  // },
+  field: {
+    gap: 6,
   },
-  sexoOption: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
-    paddingVertical: 8,
-    alignItems: "center",
-  },
-  sexoOptionActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.indigo,
-  },
-  sexoText: {
-    fontSize: 13,
+  label: {
+    fontSize: 14,
+    fontFamily: Fonts.body.semiBold,
     color: Colors.text,
-    fontFamily: Fonts.body.regular,
-  },
-  sexoTextActive: {
-    fontFamily: Fonts.body.bold,
   },
 });
