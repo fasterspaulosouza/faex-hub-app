@@ -16,6 +16,7 @@ import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { StepIndicator } from "@/components/StepIndicator";
 import RadioGroup from "@/components/RadioGroup";
+import { DateInputField } from "@/components/DateInputField";
 
 const SEXO_OPTIONS = ["Masculino", "Feminino"];
 
@@ -129,21 +130,27 @@ export default function CadastroScreen() {
                 <RadioGroup value={sexo} onChange={setSexo} />
               </View>
 
-              <FormField
-                label="Email"
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Digite o seu e-mail"
-                keyboardType="email-address"
-              />
-
-              <FormField
+              {/* <FormField
                 label="Data de Nascimento"
                 value={dataNascimento}
                 onChangeText={(data) => setDataNascimento(maskDate(data))}
                 placeholder="DD/MM/AAAA"
                 keyboardType="numeric"
                 maxLength={10}
+              /> */}
+
+              <DateInputField
+                label="Data de nascimento"
+                value={dataNascimento}
+                onChange={setDataNascimento}
+              />
+
+              <FormField
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Digite o seu e-mail"
+                keyboardType="email-address"
               />
 
               <FormField
