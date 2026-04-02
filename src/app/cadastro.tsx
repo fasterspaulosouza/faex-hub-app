@@ -14,37 +14,9 @@ import { useState } from "react";
 import { maskCEP, maskCPF, maskDate, maskPhone } from "@/utils/masks";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
+import { StepIndicator } from "@/components/StepIndicator";
 
 const SEXO_OPTIONS = ["Masculino", "Feminino"];
-const UF_OPTIONS = [
-  { label: "Acre", value: "AC" },
-  { label: "Alagoas", value: "AL" },
-  { label: "Amapá", value: "AP" },
-  { label: "Amazonas", value: "AM" },
-  { label: "Bahia", value: "BA" },
-  { label: "Ceará", value: "CE" },
-  { label: "Distrito Federal", value: "DF" },
-  { label: "Espírito Santo", value: "ES" },
-  { label: "Goiás", value: "GO" },
-  { label: "Maranhão", value: "MA" },
-  { label: "Mato Grosso", value: "MT" },
-  { label: "Mato Grosso do Sul", value: "MS" },
-  { label: "Minas Gerais", value: "MG" },
-  { label: "Pará", value: "PA" },
-  { label: "Paraíba", value: "PB" },
-  { label: "Paraná", value: "PR" },
-  { label: "Pernambuco", value: "PE" },
-  { label: "Piauí", value: "PI" },
-  { label: "Rio de Janeiro", value: "RJ" },
-  { label: "Rio Grande do Norte", value: "RN" },
-  { label: "Rio Grande do Sul", value: "RS" },
-  { label: "Rondônia", value: "RO" },
-  { label: "Roraima", value: "RR" },
-  { label: "Santa Catarina", value: "SC" },
-  { label: "São Paulo", value: "SP" },
-  { label: "Sergipe", value: "SE" },
-  { label: "Tocantins", value: "TO" },
-];
 
 export default function CadastroScreen() {
   const [step, setStep] = useState(1);
@@ -118,6 +90,7 @@ export default function CadastroScreen() {
           <Logo width={165} height={53} style={styles.logo} />
           <View style={styles.divider} />
           <Text style={styles.title}>Novo Cadastro</Text>
+          <StepIndicator currentStep={step} />
 
           {step === 1 && (
             <>
@@ -247,6 +220,7 @@ export default function CadastroScreen() {
                 editable={!loadingCep}
               />
 
+              <Button label="Voltar" onPress={() => setStep(1)} />
               <Button label="Finalizar" />
             </>
           )}
