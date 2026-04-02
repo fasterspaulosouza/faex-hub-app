@@ -11,13 +11,43 @@ import {
 import Logo from "@/assets/logo_black.svg";
 import { FormField } from "@/components/formField";
 import { useState } from "react";
+import { maskCEP, maskCPF, maskDate, maskPhone } from "@/utils/masks";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
 
 const SEXO_OPTIONS = ["Masculino", "Feminino"];
+const UF_OPTIONS = [
+  { label: "Acre", value: "AC" },
+  { label: "Alagoas", value: "AL" },
+  { label: "Amapá", value: "AP" },
+  { label: "Amazonas", value: "AM" },
+  { label: "Bahia", value: "BA" },
+  { label: "Ceará", value: "CE" },
+  { label: "Distrito Federal", value: "DF" },
+  { label: "Espírito Santo", value: "ES" },
+  { label: "Goiás", value: "GO" },
+  { label: "Maranhão", value: "MA" },
+  { label: "Mato Grosso", value: "MT" },
+  { label: "Mato Grosso do Sul", value: "MS" },
+  { label: "Minas Gerais", value: "MG" },
+  { label: "Pará", value: "PA" },
+  { label: "Paraíba", value: "PB" },
+  { label: "Paraná", value: "PR" },
+  { label: "Pernambuco", value: "PE" },
+  { label: "Piauí", value: "PI" },
+  { label: "Rio de Janeiro", value: "RJ" },
+  { label: "Rio Grande do Norte", value: "RN" },
+  { label: "Rio Grande do Sul", value: "RS" },
+  { label: "Rondônia", value: "RO" },
+  { label: "Roraima", value: "RR" },
+  { label: "Santa Catarina", value: "SC" },
+  { label: "São Paulo", value: "SP" },
+  { label: "Sergipe", value: "SE" },
+  { label: "Tocantins", value: "TO" },
+];
 
 export default function CadastroScreen() {
   const [step, setStep] = useState(1);
-  const [carregando, setCarregando] = useState(false);
-  const [erro, setError] = useState("");
 
   // Passo 01
   const [nome, setNome] = useState("");
@@ -28,6 +58,51 @@ export default function CadastroScreen() {
   const [dataNascimento, setDataNascimento] = useState("");
   const [telefone, setTelefone] = useState("");
   const [documento, setDocumento] = useState("");
+
+  // Passo 02
+  const [cep, setCep] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [numero, setNumero] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [uf, setUf] = useState("");
+  const [endereco, setEndereco] = useState("");
+  const [complemento, setComplemento] = useState("");
+  const [loadingCep, setLoadingCep] = useState(false);
+
+  async function fetchEnderecoPorCep(maskedCep: string) {
+    const digits = maskedCep.replace(/\D/g, "");
+    setLoadingCep(true);
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+      const data = await response.json();
+
+      console.log(data);
+
+      if (data.erro) {
+        console.log("CEP não encontrado");
+        return;
+      }
+
+      setBairro(data.bairro ?? "");
+      setCidade(data.localidade ?? "");
+      setUf(data.uf ?? "");
+      setEndereco(data.logradouro ?? "");
+    } catch {
+      console.log("Erro ao buscar CEP.");
+    } finally {
+      setLoadingCep(false);
+    }
+  }
+
+  function handleCepChange(text: string) {
+    const masked = maskCEP(text);
+    setCep(masked);
+
+    if (masked.length === 9) {
+      fetchEnderecoPorCep(masked);
+    }
+  }
 
   return (
     <KeyboardAvoidingView
@@ -44,51 +119,137 @@ export default function CadastroScreen() {
           <View style={styles.divider} />
           <Text style={styles.title}>Novo Cadastro</Text>
 
-          <FormField
-            label="Nome"
-            value={nome}
-            onChangeText={setNome}
-            placeholder="Digite o seu completo"
-          />
+          {step === 1 && (
+            <>
+              <FormField
+                label="Nome"
+                value={nome}
+                onChangeText={setNome}
+                placeholder="Digite o seu completo"
+              />
 
-          {/* Provisório */}
-          <View style={styles.sexoRow}>
-            {SEXO_OPTIONS.map((opc) => (
-              <Pressable
-                key={opc}
-                style={[
-                  styles.sexoOption,
-                  sexo === opc && styles.sexoOptionActive,
-                ]}
-                onPress={() => setSexo(opc)}
-              >
-                <Text
-                  style={[
-                    styles.sexoText,
-                    sexo === opc && styles.sexoTextActive,
-                  ]}
-                >
-                  {opc}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
+              {/* Provisório */}
+              <View style={styles.sexoRow}>
+                {SEXO_OPTIONS.map((opc) => (
+                  <Pressable
+                    key={opc}
+                    style={[
+                      styles.sexoOption,
+                      sexo === opc && styles.sexoOptionActive,
+                    ]}
+                    onPress={() => setSexo(opc)}
+                  >
+                    <Text
+                      style={[
+                        styles.sexoText,
+                        sexo === opc && styles.sexoTextActive,
+                      ]}
+                    >
+                      {opc}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
 
-          <FormField
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Digite o seu e-mail"
-            keyboardType="email-address"
-          />
+              <FormField
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Digite o seu e-mail"
+                keyboardType="email-address"
+              />
 
-          <FormField
-            label="Data de Nascimento"
-            value={dataNascimento}
-            onChangeText={setDataNascimento}
-            placeholder="DD/MM/AAA"
-            keyboardType="numeric"
-          />
+              <FormField
+                label="Data de Nascimento"
+                value={dataNascimento}
+                onChangeText={(data) => setDataNascimento(maskDate(data))}
+                placeholder="DD/MM/AAAA"
+                keyboardType="numeric"
+                maxLength={10}
+              />
+
+              <FormField
+                label="Telefone"
+                value={telefone}
+                onChangeText={(data) => setTelefone(maskPhone(data))}
+                placeholder="(11) 90000-0000"
+                keyboardType="phone-pad"
+                maxLength={18}
+              />
+
+              <FormField
+                label="CPF"
+                value={documento}
+                onChangeText={(data) => setDocumento(maskCPF(data))}
+                placeholder="000.000.000-00"
+                keyboardType="numeric"
+                maxLength={14}
+              />
+
+              <Button label="Próximo" onPress={() => setStep(2)} />
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <View>
+                <View>
+                  <Text>CEP</Text>
+                </View>
+                <Input
+                  value={cep}
+                  onChangeText={handleCepChange}
+                  placeholder="00000-000"
+                  keyboardType="numeric"
+                  maxLength={9}
+                  editable={!loadingCep}
+                />
+              </View>
+
+              <FormField
+                label="Bairro"
+                value={bairro}
+                onChangeText={setBairro}
+                placeholder="Digite seu Bairro"
+                editable={!loadingCep}
+              />
+
+              <FormField
+                label="Numero"
+                value={numero}
+                onChangeText={setNumero}
+                placeholder="Digite seu Numero"
+                keyboardType="numeric"
+                editable={!loadingCep}
+              />
+
+              <FormField
+                label="Cidade"
+                value={cidade}
+                onChangeText={setCidade}
+                placeholder="Digite sua Cidade"
+                editable={!loadingCep}
+              />
+
+              <FormField
+                label="UF"
+                value={uf}
+                onChangeText={setUf}
+                placeholder="Digite seu Estado"
+                editable={!loadingCep}
+              />
+
+              <FormField
+                label="Endereço"
+                value={endereco}
+                onChangeText={setEndereco}
+                placeholder="Digite seu Endereço"
+                editable={!loadingCep}
+              />
+
+              <Button label="Finalizar" />
+            </>
+          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -106,6 +267,7 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 32,
+    gap: 16,
   },
   logo: {
     alignSelf: "center",
