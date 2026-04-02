@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import Logo from "@/assets/logo_black.svg";
 import { Colors, Fonts } from "@/constants/theme";
+import { Href, router } from "expo-router";
 
 export default function Index() {
   const [email, setEmail] = useState("");
@@ -51,7 +52,11 @@ export default function Index() {
           />
 
           <Button label="Entrar" variant="primary" />
-          <Button label="Cadastra-se" variant="outline" />
+          <Button
+            label="Cadastra-se"
+            variant="outline"
+            onPress={() => router.push("/cadastro" as Href)}
+          />
           <Button label="Esqueceu sua senha?" variant="ghost" />
         </View>
       </ScrollView>

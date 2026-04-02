@@ -5,6 +5,7 @@ export const Colors = {
   white: "#FFF",
   black: "#000",
   icon: "#9CA3AF",
+  indigo: "#eef2ff",
 } as const;
 
 export const Fonts = {
