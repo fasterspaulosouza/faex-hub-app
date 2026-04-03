@@ -44,8 +44,8 @@ export function Select({
         <Pressable style={styles.overlay} onPress={() => setOpen(false)} />
 
         <SafeAreaView style={styles.sheet}>
-          <View style={styles.sheetHandle}>
-            <FlatList
+          <View style={styles.sheetHandle} />
+          <FlatList
               data={options}
               keyExtractor={(item) => item.value}
               renderItem={({ item }) => (
@@ -77,7 +77,6 @@ export function Select({
                 </Pressable>
               )}
             />
-          </View>
         </SafeAreaView>
       </Modal>
     </>
