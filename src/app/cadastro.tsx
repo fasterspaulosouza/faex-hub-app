@@ -1,5 +1,6 @@
 import { Colors, Fonts } from "@/constants/theme";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -17,8 +18,38 @@ import { Input } from "@/components/Input";
 import { StepIndicator } from "@/components/StepIndicator";
 import RadioGroup from "@/components/RadioGroup";
 import { DateInputField } from "@/components/DateInputField";
+import { Select, SelectOption } from "@/components/Select";
 
-const SEXO_OPTIONS = ["Masculino", "Feminino"];
+// const SEXO_OPTIONS = ["Masculino", "Feminino"];
+const UF_OPTIONS: SelectOption[] = [
+  { label: "Acre", value: "AC" },
+  { label: "Alagoas", value: "AL" },
+  { label: "Amapá", value: "AP" },
+  { label: "Amazonas", value: "AM" },
+  { label: "Bahia", value: "BA" },
+  { label: "Ceará", value: "CE" },
+  { label: "Distrito Federal", value: "DF" },
+  { label: "Espírito Santo", value: "ES" },
+  { label: "Goiás", value: "GO" },
+  { label: "Maranhão", value: "MA" },
+  { label: "Mato Grosso", value: "MT" },
+  { label: "Mato Grosso do Sul", value: "MS" },
+  { label: "Minas Gerais", value: "MG" },
+  { label: "Pará", value: "PA" },
+  { label: "Paraíba", value: "PB" },
+  { label: "Paraná", value: "PR" },
+  { label: "Pernambuco", value: "PE" },
+  { label: "Piauí", value: "PI" },
+  { label: "Rio de Janeiro", value: "RJ" },
+  { label: "Rio Grande do Norte", value: "RN" },
+  { label: "Rio Grande do Sul", value: "RS" },
+  { label: "Rondônia", value: "RO" },
+  { label: "Roraima", value: "RR" },
+  { label: "Santa Catarina", value: "SC" },
+  { label: "São Paulo", value: "SP" },
+  { label: "Sergipe", value: "SE" },
+  { label: "Tocantins", value: "TO" },
+];
 
 export default function CadastroScreen() {
   const [step, setStep] = useState(1);
@@ -104,7 +135,7 @@ export default function CadastroScreen() {
 
               {/* Provisório */}
               {/* <View style={styles.sexoRow}>
-                {SEXO_OPTIONS.map((opc) => (
+                // {SEXO_OPTIONS.map((opc) => (
                   <Pressable
                     key={opc}
                     style={[
@@ -146,14 +177,6 @@ export default function CadastroScreen() {
               />
 
               <FormField
-                label="Email"
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Digite o seu e-mail"
-                keyboardType="email-address"
-              />
-
-              <FormField
                 label="Telefone"
                 value={telefone}
                 onChangeText={(data) => setTelefone(maskPhone(data))}
@@ -171,15 +194,42 @@ export default function CadastroScreen() {
                 maxLength={14}
               />
 
+              <FormField
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Digite o seu e-mail"
+                keyboardType="email-address"
+              />
+
+              <FormField
+                label="Senha"
+                value={senha}
+                onChangeText={setSenha}
+                placeholder="Digite sua senha"
+                secureTextEntry
+              />
+
+              <FormField
+                label="Confirmar senha"
+                value={confirmarSenha}
+                onChangeText={setConfirmarSenha}
+                placeholder="Confirme sua senha"
+                secureTextEntry
+              />
+
               <Button label="Próximo" onPress={() => setStep(2)} />
             </>
           )}
 
           {step === 2 && (
             <>
-              <View>
-                <View>
-                  <Text>CEP</Text>
+              <View style={styles.field}>
+                <View style={styles.labelRow}>
+                  <Text style={styles.label}>CEP</Text>
+                  {loadingCep && (
+                    <ActivityIndicator size="small" color={Colors.primary} />
+                  )}
                 </View>
                 <Input
                   value={cep}
@@ -216,13 +266,23 @@ export default function CadastroScreen() {
                 editable={!loadingCep}
               />
 
-              <FormField
+              {/* <FormField
                 label="UF"
                 value={uf}
                 onChangeText={setUf}
                 placeholder="Digite seu Estado"
                 editable={!loadingCep}
-              />
+              /> */}
+
+              <View style={styles.ufField}>
+                <Text style={styles.label}>UF</Text>
+                <Select
+                  options={UF_OPTIONS}
+                  value={uf}
+                  onChange={setUf}
+                  placeholder="Selecione..."
+                />
+              </View>
 
               <FormField
                 label="Endereço"
@@ -230,6 +290,17 @@ export default function CadastroScreen() {
                 onChangeText={setEndereco}
                 placeholder="Digite seu Endereço"
                 editable={!loadingCep}
+              />
+
+              <FormField
+                label="Complemento"
+                value={complemento}
+                onChangeText={setComplemento}
+                placeholder="Ex: Ao lado da FAEX"
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+                style={styles.textArea}
               />
 
               <Button label="Voltar" onPress={() => setStep(1)} />
@@ -301,5 +372,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.body.semiBold,
     color: Colors.text,
+  },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  textArea: {
+    fontSize: 12,
+    fontFamily: Fonts.body.regular,
+    color: Colors.text,
+  },
+  ufField: {
+    gap: 6,
   },
 });
