@@ -51,7 +51,11 @@ export default function Index() {
             showToggle
           />
 
-          <Button label="Entrar" variant="primary" />
+          <Button
+            label="Entrar"
+            variant="primary"
+            onPress={() => router.push("/(tabs)/inicio" as Href)}
+          />
           <Button
             label="Cadastra-se"
             variant="outline"
