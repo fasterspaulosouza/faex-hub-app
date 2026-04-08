@@ -2,6 +2,7 @@ import { Colors } from "@/constants/theme";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import Logo from "@/assets/logo_black.svg";
 import { ProfileBanner } from "@/components/ProfileBanner";
+import { PostCreator } from "@/components/PostCreator";
 
 export default function InicioScreen() {
   return (
@@ -22,6 +23,9 @@ export default function InicioScreen() {
           email="paulo.souza@example.com"
           avatarUri="@/assets/avatar.png"
         />
+
+        {/* Criador de publicaçoes */}
+        <PostCreator />
       </ScrollView>
     </SafeAreaView>
   );
