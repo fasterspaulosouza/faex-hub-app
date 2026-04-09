@@ -15,8 +15,8 @@ export type ActivityCardData = {
   userName: string;
   date: string;
   isPrivate?: boolean;
-  userAvatarUri?: ImageSourcePropType;
-  mediaUri?: ImageSourcePropType;
+  userAvatar?: ImageSourcePropType;
+  media?: ImageSourcePropType;
 };
 
 type Props = {
@@ -28,9 +28,9 @@ export function ActivityCard({ data }: Props) {
 
   return (
     <View style={styles.card}>
-      {/* Header */}
+      {/* Cabeçalho do card */}
       <View style={styles.header}>
-        <Image source={data.userAvatarUri ?? {}} style={styles.userAvatar} />
+        <Image source={data.userAvatar ?? {}} style={styles.userAvatar} />
         <View style={styles.headerInfo}>
           <Text style={styles.userName}>{data.userName}</Text>
           <View style={styles.metaRow}>
@@ -45,10 +45,10 @@ export function ActivityCard({ data }: Props) {
         </View>
       </View>
 
-      {/* Body */}
+      {/* Thumbnail da mídia */}
       <View style={styles.mediaThumbnail}>
         <Image
-          source={data.mediaUri ?? {}}
+          source={data.media ?? {}}
           style={styles.mediaImage}
           resizeMode="cover"
         />
@@ -57,7 +57,7 @@ export function ActivityCard({ data }: Props) {
         </Pressable>
       </View>
 
-      {/* Footer */}
+      {/* Ação de curtir */}
       <Pressable
         style={styles.likeButton}
         onPress={() => setLiked((prev) => !prev)}
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 22,
     borderWidth: 2,
-    borderColor: "#F472b6",
+    borderColor: "#f472b6",
     backgroundColor: Colors.indigo,
   },
   headerInfo: {

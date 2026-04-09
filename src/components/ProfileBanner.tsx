@@ -1,4 +1,3 @@
-import Logo from "@/assets/logo_white.svg";
 import { Colors, Fonts } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -9,27 +8,36 @@ import {
   Text,
   View,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import LogoWhite from "@/assets/logo_white.svg";
 
 type Props = {
   name: string;
   email: string;
-  avatarUri?: ImageSourcePropType;
+  avatar?: ImageSourcePropType;
   onEditPress?: () => void;
 };
 
-export function ProfileBanner({ name, email, avatarUri, onEditPress }: Props) {
+export function ProfileBanner({ name, email, avatar, onEditPress }: Props) {
   return (
     <View style={styles.container}>
-      <View style={styles.banner}>
-        <Logo />
-      </View>
+      {/* Banner com gradiente */}
+      <LinearGradient
+        colors={["#a5b4e8", "#c4cff0"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.banner}
+      >
+        <LogoWhite width={130} height={42} />
+      </LinearGradient>
 
-      <Pressable style={styles.editBotton} onPress={onEditPress}>
+      {/* Avatar sobrepondo o banner */}
+      <Image source={avatar ?? {}} style={styles.avatar} />
+
+      {/* Botão de editar */}
+      <Pressable style={styles.editButton} onPress={onEditPress}>
         <Ionicons name="pencil-outline" size={16} color={Colors.text} />
       </Pressable>
-
-      {/* Deixar o import dinamico via url */}
-      <Image source={avatarUri} style={styles.avatar} />
 
       <View style={styles.info}>
         <Text style={styles.name}>{name}</Text>
@@ -45,18 +53,17 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   banner: {
-    height: 100,
-    backgroundColor: "#b8c4ea",
+    height: 110,
     alignItems: "center",
     justifyContent: "center",
   },
-  editBotton: {
+  editButton: {
     position: "absolute",
-    top: 108,
+    top: 118,
     right: 16,
-    width: 32,
-    height: 32,
-    borderRadius: 18,
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.border,
     backgroundColor: Colors.white,
@@ -65,23 +72,22 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 3,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    borderWidth: 4,
     borderColor: "#f472b6",
     backgroundColor: Colors.indigo,
-    marginTop: -40,
+    marginTop: -44,
     marginLeft: 16,
   },
   info: {
     paddingHorizontal: 16,
     paddingTop: 10,
     paddingBottom: 16,
-    marginTop: 8,
   },
   name: {
-    fontSize: 20,
+    fontSize: 22,
     fontFamily: Fonts.title.bold,
     color: Colors.text,
   },
