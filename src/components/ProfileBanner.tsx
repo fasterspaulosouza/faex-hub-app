@@ -1,12 +1,19 @@
 import Logo from "@/assets/logo_white.svg";
 import { Colors, Fonts } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  ImageSourcePropType,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 type Props = {
   name: string;
   email: string;
-  avatarUri?: string;
+  avatarUri?: ImageSourcePropType;
   onEditPress?: () => void;
 };
 
@@ -22,7 +29,7 @@ export function ProfileBanner({ name, email, avatarUri, onEditPress }: Props) {
       </Pressable>
 
       {/* Deixar o import dinamico via url */}
-      <Image source={require("@/assets/avatar.png")} style={styles.avatar} />
+      <Image source={avatarUri} style={styles.avatar} />
 
       <View style={styles.info}>
         <Text style={styles.name}>{name}</Text>

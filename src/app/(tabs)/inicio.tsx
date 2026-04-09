@@ -5,22 +5,28 @@ import { ProfileBanner } from "@/components/ProfileBanner";
 import { PostCreator } from "@/components/PostCreator";
 import { ActivityCard, ActivityCardData } from "@/components/ActivityCard";
 
+// Imagem das atividades:
+import avatarPost from "@/assets/avatar-post.png";
+import avatarImg from "@/assets/avatar.png";
+import post01 from "@/assets/post-01.png";
+import post02 from "@/assets/post-02.png";
+
 const MOCK_ACTIVITIES: ActivityCardData[] = [
   {
     id: "1",
     userName: "Maria Oliveira",
     date: "2 horas atrás",
     isPrivate: true,
-    userAvatarUri: "",
-    mediaUri: "",
+    userAvatarUri: avatarPost,
+    mediaUri: post01,
   },
   {
     id: "2",
     userName: "João Silva",
     date: "1 hora atrás",
     isPrivate: false,
-    userAvatarUri: "",
-    mediaUri: "",
+    userAvatarUri: avatarPost,
+    mediaUri: post02,
   },
 ];
 
@@ -41,7 +47,7 @@ export default function InicioScreen() {
         <ProfileBanner
           name="Paulo Souza"
           email="paulo.souza@example.com"
-          avatarUri="@/assets/avatar.png"
+          avatarUri={avatarImg}
         />
 
         {/* Criador de publicaçoes */}
