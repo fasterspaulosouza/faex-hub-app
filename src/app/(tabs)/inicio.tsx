@@ -4,7 +4,7 @@ import { ProfileBanner } from "@/components/ProfileBanner";
 import { Colors, Fonts } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/services/api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -15,16 +15,21 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type ApiAtividade = {
+type ApiPublicacao = {
   id: number;
-  usuario: {
+  autor: {
     id: number;
     nome: string;
+    foto?: string;
     avatarUrl?: string;
-  };
-  criadaEm: string;
-  privada?: boolean;
-  midiaUrl?: string;
+  } | null;
+  autorId: number;
+  conteudo: string;
+  createdAt: string;
+  midia: string | null;
+  tipo: string;
+  visibilidade: "PUBLICO" | "AMIGOS" | "PRIVADO";
+  ativo: boolean;
 };
 
 function formatDate(iso: string): string {
@@ -37,45 +42,52 @@ function formatDate(iso: string): string {
   });
 }
 
-function mapAtividade(a: ApiAtividade): ActivityCardData {
+function mapPublicacao(p: ApiPublicacao): ActivityCardData {
+  const avatarUri = p.autor?.foto ?? p.autor?.avatarUrl;
   return {
-    id: String(a.id),
-    userName: a.usuario.nome,
-    date: formatDate(a.criadaEm),
-    isPrivate: a.privada,
-    userAvatar: a.usuario.avatarUrl ? { uri: a.usuario.avatarUrl } : undefined,
-    media: a.midiaUrl ? { uri: a.midiaUrl } : undefined,
+    id: String(p.id),
+    userName: p.autor?.nome ?? "Usuário",
+    date: formatDate(p.createdAt),
+    content: p.conteudo,
+    isPrivate: p.visibilidade !== "PUBLICO",
+    userAvatar: avatarUri ? { uri: avatarUri } : undefined,
+    media: p.midia ? { uri: p.midia } : undefined,
   };
 }
 
 export default function InicioScreen() {
   const { usuario } = useAuth();
+  const usuarioId = usuario?.id;
+
   const [atividades, setAtividades] = useState<ActivityCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
-  console.log(usuario?.foto);
-
-  useEffect(() => {
-    if (!usuario) return;
-    const usuarioId = usuario.id;
-
-    async function fetchAtividades() {
-      try {
-        setLoading(true);
-        setErro(null);
-        const { data } = await api.get(`/atividades?usuarioId=${usuarioId}`);
-        console.log(data);
-        setAtividades((data.atividades ?? []).map(mapAtividade));
-      } catch {
-        setErro("Não foi possível carregar as atividades.");
-      } finally {
-        setLoading(false);
-      }
+  const fetchAtividades = useCallback(async () => {
+    if (!usuarioId) return;
+    try {
+      setLoading(true);
+      setErro(null);
+      const { data } = await api.get("/publicacoes/minhas");
+      console.log(data);
+      const lista = Array.isArray(data)
+        ? data
+        : Array.isArray(data.dados)
+          ? data.dados
+          : [];
+      setAtividades(lista.map(mapPublicacao));
+    } catch (err) {
+      console.error("[InicioScreen] Erro ao buscar atividades:", err);
+      setErro("Não foi possível carregar as atividades.");
+    } finally {
+      setLoading(false);
     }
+  }, [usuarioId]);
 
+  // Só re-busca quando o ID do usuário muda (não a cada refresh de dados do usuário)
+  useEffect(() => {
     fetchAtividades();
-  }, [usuario]);
+  }, [fetchAtividades]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -84,13 +96,10 @@ export default function InicioScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Banner de perfil com dados do usuário autenticado */}
         <ProfileBanner />
 
-        {/* Criador de publicação */}
         <PostCreator />
 
-        {/* Seção de atividades */}
         <Text style={styles.sectionTitle}>Atividades</Text>
 
         {loading && (
@@ -101,7 +110,14 @@ export default function InicioScreen() {
           />
         )}
 
-        {!loading && erro && <Text style={styles.feedbackText}>{erro}</Text>}
+        {!loading && erro && (
+          <View style={styles.feedbackContainer}>
+            <Text style={styles.feedbackText}>{erro}</Text>
+            <Pressable style={styles.retryButton} onPress={fetchAtividades}>
+              <Text style={styles.retryText}>Tentar novamente</Text>
+            </Pressable>
+          </View>
+        )}
 
         {!loading && !erro && atividades.length === 0 && (
           <Text style={styles.feedbackText}>Nenhuma atividade encontrada.</Text>
@@ -140,13 +156,29 @@ const styles = StyleSheet.create({
   loader: {
     marginTop: 24,
   },
+  feedbackContainer: {
+    alignItems: "center",
+    marginTop: 24,
+    gap: 12,
+  },
   feedbackText: {
     textAlign: "center",
     color: Colors.icon,
     fontFamily: Fonts.body.regular,
     fontSize: 14,
-    marginTop: 24,
     marginHorizontal: 16,
+  },
+  retryButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+  },
+  retryText: {
+    color: Colors.primary,
+    fontFamily: Fonts.title.bold,
+    fontSize: 13,
   },
   bottomSpacing: {
     height: 20,

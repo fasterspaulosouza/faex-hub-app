@@ -14,6 +14,7 @@ export type ActivityCardData = {
   id: string;
   userName: string;
   date: string;
+  content?: string;
   isPrivate?: boolean;
   userAvatar?: ImageSourcePropType;
   media?: ImageSourcePropType;
@@ -45,17 +46,24 @@ export function ActivityCard({ data }: Props) {
         </View>
       </View>
 
+      {/* Conteúdo de texto */}
+      {data.content && (
+        <Text style={styles.content}>{data.content}</Text>
+      )}
+
       {/* Thumbnail da mídia */}
-      <View style={styles.mediaThumbnail}>
-        <Image
-          source={data.media ?? {}}
-          style={styles.mediaImage}
-          resizeMode="cover"
-        />
-        <Pressable style={styles.playButton}>
-          <Ionicons name="play" size={30} color={Colors.white} />
-        </Pressable>
-      </View>
+      {data.media && (
+        <View style={styles.mediaThumbnail}>
+          <Image
+            source={data.media}
+            style={styles.mediaImage}
+            resizeMode="cover"
+          />
+          <Pressable style={styles.playButton}>
+            <Ionicons name="play" size={30} color={Colors.white} />
+          </Pressable>
+        </View>
+      )}
 
       {/* Ação de curtir */}
       <Pressable
@@ -121,6 +129,14 @@ const styles = StyleSheet.create({
   dot: {
     fontSize: 12,
     color: Colors.icon,
+  },
+  content: {
+    fontSize: 14,
+    fontFamily: Fonts.body.regular,
+    color: Colors.text,
+    paddingHorizontal: 14,
+    paddingBottom: 12,
+    lineHeight: 20,
   },
   mediaThumbnail: {
     height: 220,
