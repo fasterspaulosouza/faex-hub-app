@@ -54,6 +54,8 @@ export default function InicioScreen() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
+  console.log(usuario?.foto);
+
   useEffect(() => {
     if (!usuario) return;
     const usuarioId = usuario.id;
@@ -63,7 +65,7 @@ export default function InicioScreen() {
         setLoading(true);
         setErro(null);
         const { data } = await api.get(`/atividades?usuarioId=${usuarioId}`);
-        console.log(data)
+        console.log(data);
         setAtividades((data.atividades ?? []).map(mapAtividade));
       } catch {
         setErro("Não foi possível carregar as atividades.");
@@ -83,11 +85,7 @@ export default function InicioScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Banner de perfil com dados do usuário autenticado */}
-        <ProfileBanner
-          name={usuario?.nome ?? ""}
-          email={usuario?.email ?? ""}
-          avatar={undefined}
-        />
+        <ProfileBanner />
 
         {/* Criador de publicação */}
         <PostCreator />

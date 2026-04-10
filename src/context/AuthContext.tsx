@@ -6,6 +6,11 @@ type Usuario = {
   id: number;
   nome: string;
   email: string;
+  foto?: string;
+  telefone?: string;
+  documento?: string;
+  aniversario?: string;
+  genero?: "MASCULINO" | "FEMININO";
 };
 
 export type CadastroPayload = {
@@ -48,6 +53,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken(storedToken);
         setUsuario(JSON.parse(storedUsuario));
         setAuthToken(storedToken);
+
+        // Atualiza dados completos do usuário em background
+        try {
+          const { data } = await api.get("/auth/me");
+          const usuarioAtualizado = data.usuario ?? data;
+          setUsuario(usuarioAtualizado);
+          await SecureStore.setItemAsync(
+            USUARIO_KEY,
+            JSON.stringify(usuarioAtualizado),
+          );
+        } catch {
+          // Mantém os dados em cache se a requisição falhar
+        }
       }
 
       setLoading(false);
@@ -57,14 +75,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function login(email: string, senha: string) {
-    console.log("Efetuando o login...")
     const { data } = await api.post("/auth/login", { email, senha });
-    console.log(data)
-    const { accessToken, usuario: usuarioData } = data;
+    const { accessToken } = data;
+
+    setAuthToken(accessToken);
+
+    const { data: meData } = await api.get("/auth/me");
+    const usuarioData = meData.usuario ?? meData;
 
     setToken(accessToken);
     setUsuario(usuarioData);
-    setAuthToken(accessToken);
 
     await Promise.all([
       SecureStore.setItemAsync(TOKEN_KEY, accessToken),
@@ -101,7 +121,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ usuario, token, loading, login, cadastrar, logout }}>
+    <AuthContext.Provider
+      value={{ usuario, token, loading, login, cadastrar, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

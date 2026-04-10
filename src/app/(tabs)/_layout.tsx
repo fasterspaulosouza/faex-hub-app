@@ -53,18 +53,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="presentes"
         options={{
-          title: "Presentes",
+          title: "Configurações",
           tabBarIcon: ({ color }) => (
-            <TabIcon name="gift-outline" color={color} />
+            <TabIcon name="settings-outline" color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="configuracoes"
         options={{
-          title: "Configurações",
+          title: "Sair",
           tabBarIcon: ({ color }) => (
-            <TabIcon name="settings-outline" color={color} />
+            <TabIcon name="log-out-outline" color={color} />
           ),
         }}
       />

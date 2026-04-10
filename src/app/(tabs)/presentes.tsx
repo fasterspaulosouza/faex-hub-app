@@ -1,18 +1,12 @@
 import { ProfileBanner } from "@/components/ProfileBanner";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import avatarImg from "@/assets/avatar.png";
 
-export default function PresentesScreen() {
+export default function ConfiguracoesScreen() {
   return (
     <SafeAreaView>
       <View>
-        {/* Header */}
-        <ProfileBanner
-          name="Paulo Souza"
-          email="paulo.souza@example.com"
-          avatar={avatarImg}
-        />
+        <ProfileBanner />
       </View>
     </SafeAreaView>
   );

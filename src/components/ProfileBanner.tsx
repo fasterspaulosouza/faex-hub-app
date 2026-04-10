@@ -1,24 +1,17 @@
 import { Colors, Fonts } from "@/constants/theme";
+import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  Image,
-  ImageSourcePropType,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import LogoWhite from "@/assets/logo_white.svg";
 
 type Props = {
-  name: string;
-  email: string;
-  avatar?: ImageSourcePropType;
   onEditPress?: () => void;
 };
 
-export function ProfileBanner({ name, email, avatar, onEditPress }: Props) {
+export function ProfileBanner({ onEditPress }: Props) {
+  const { usuario } = useAuth();
+
   return (
     <View style={styles.container}>
       {/* Banner com gradiente */}
@@ -32,16 +25,24 @@ export function ProfileBanner({ name, email, avatar, onEditPress }: Props) {
       </LinearGradient>
 
       {/* Avatar sobrepondo o banner */}
-      <Image source={avatar ?? {}} style={styles.avatar} />
+      {usuario?.foto ? (
+        <Image source={{ uri: usuario.foto }} style={styles.avatar} />
+      ) : (
+        <View style={[styles.avatar, styles.avatarPlaceholder]}>
+          <Ionicons name="person" size={40} color={Colors.white} />
+        </View>
+      )}
 
       {/* Botão de editar */}
-      <Pressable style={styles.editButton} onPress={onEditPress}>
-        <Ionicons name="pencil-outline" size={16} color={Colors.text} />
-      </Pressable>
+      {onEditPress && (
+        <Pressable style={styles.editButton} onPress={onEditPress}>
+          <Ionicons name="pencil-outline" size={16} color={Colors.text} />
+        </Pressable>
+      )}
 
       <View style={styles.info}>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.email}>{email}</Text>
+        <Text style={styles.name}>{usuario?.nome ?? ""}</Text>
+        <Text style={styles.email}>{usuario?.email ?? ""}</Text>
       </View>
     </View>
   );
@@ -80,6 +81,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.indigo,
     marginTop: -44,
     marginLeft: 16,
+  },
+  avatarPlaceholder: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   info: {
     paddingHorizontal: 16,
