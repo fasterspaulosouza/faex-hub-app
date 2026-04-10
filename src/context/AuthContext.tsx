@@ -57,7 +57,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function login(email: string, senha: string) {
+    console.log("Efetuando o login...")
     const { data } = await api.post("/auth/login", { email, senha });
+    console.log(data)
     const { accessToken, usuario: usuarioData } = data;
 
     setToken(accessToken);

@@ -2,6 +2,7 @@ import { Button } from "@/components/Button";
 import { FormField } from "@/components/formField";
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -12,10 +13,33 @@ import {
 import Logo from "@/assets/logo_black.svg";
 import { Colors, Fonts } from "@/constants/theme";
 import { Href, router } from "expo-router";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Index() {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin() {
+    if (!email || !senha) {
+      Alert.alert("Atenção", "Preencha o e-mail e a senha.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await login(email, senha);
+      // NavigationGuard redireciona automaticamente para /(tabs)/inicio
+    } catch (err: any) {
+      console.log("LOGIN ERROR:", JSON.stringify(err?.response?.data, null, 2));
+      const mensagem =
+        err?.response?.data?.message ?? "Erro ao fazer login. Tente novamente.";
+      Alert.alert("Erro", mensagem);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <KeyboardAvoidingView
@@ -52,9 +76,9 @@ export default function Index() {
           />
 
           <Button
-            label="Entrar"
+            label={loading ? "Entrando..." : "Entrar"}
             variant="primary"
-            onPress={() => router.push("/(tabs)/inicio" as Href)}
+            onPress={handleLogin}
           />
           <Button
             label="Cadastra-se"

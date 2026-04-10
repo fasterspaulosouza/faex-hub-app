@@ -8,6 +8,7 @@ import avatarPost from "@/assets/avatar-post.png";
 import avatarImg from "@/assets/avatar.png";
 import post01 from "@/assets/post-01.png";
 import post02 from "@/assets/post-02.png";
+import { useAuth } from "@/context/AuthContext";
 
 const MOCK_ACTIVITIES: ActivityCardData[] = [
   {
@@ -29,6 +30,8 @@ const MOCK_ACTIVITIES: ActivityCardData[] = [
 ];
 
 export default function InicioScreen() {
+  const { usuario } = useAuth()
+  console.log(usuario)
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <ScrollView
@@ -38,8 +41,8 @@ export default function InicioScreen() {
       >
         {/* Banner de perfil */}
         <ProfileBanner
-          name="Paulo Souza"
-          email="paulo.souza@example.com"
+          name={usuario?.nome || ""}
+          email={usuario?.email || ""}
           avatar={avatarImg}
         />
 

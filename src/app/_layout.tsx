@@ -1,5 +1,5 @@
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import {
@@ -12,8 +12,31 @@ import {
   Inter_500Medium,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
+
+function NavigationGuard({ children }: { children: React.ReactNode }) {
+  const { token, loading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading) return;
+
+    const inTabsGroup = segments[0] === "(tabs)";
+
+    if (!token && inTabsGroup) {
+      router.replace("/");
+    } else if (token && !inTabsGroup) {
+      router.replace("/(tabs)/inicio");
+    }
+  }, [token, loading, segments]);
+
+  if (loading) return null;
+
+  return <>{children}</>;
+}
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -33,5 +56,11 @@ export default function RootLayout() {
 
   if (!loaded) return null;
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <AuthProvider>
+      <NavigationGuard>
+        <Stack screenOptions={{ headerShown: false }} />
+      </NavigationGuard>
+    </AuthProvider>
+  );
 }
