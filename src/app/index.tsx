@@ -1,6 +1,6 @@
 import { Button } from "@/components/Button";
 import { FormField } from "@/components/formField";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -11,12 +11,16 @@ import {
   View,
 } from "react-native";
 import Logo from "@/assets/logo_black.svg";
-import { Colors, Fonts } from "@/constants/theme";
+import { Fonts } from "@/constants/theme";
 import { Href, router } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
+import type { ThemeColors } from "@/constants/theme";
 
 export default function Index() {
   const { login } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,7 +34,6 @@ export default function Index() {
     setLoading(true);
     try {
       await login(email, senha);
-      // NavigationGuard redireciona automaticamente para /(tabs)/inicio
     } catch (err: any) {
       console.log("LOGIN ERROR:", JSON.stringify(err?.response?.data, null, 2));
       const mensagem =
@@ -92,27 +95,29 @@ export default function Index() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 32,
-    justifyContent: "center",
-    gap: 24,
-    backgroundColor: Colors.white,
-  },
-  logo: {
-    alignSelf: "center",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: Colors.border,
-    width: "100%",
-  },
-  title: {
-    textAlign: "center",
-    color: Colors.text,
-    fontSize: 31,
-    fontFamily: Fonts.title.bold,
-    lineHeight: 36,
-  },
-});
+function makeStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 32,
+      justifyContent: "center",
+      gap: 24,
+      backgroundColor: colors.background,
+    },
+    logo: {
+      alignSelf: "center",
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.border,
+      width: "100%",
+    },
+    title: {
+      textAlign: "center",
+      color: colors.text,
+      fontSize: 31,
+      fontFamily: Fonts.title.bold,
+      lineHeight: 36,
+    },
+  });
+}

@@ -13,6 +13,7 @@ import {
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -57,10 +58,12 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <AuthProvider>
-      <NavigationGuard>
-        <Stack screenOptions={{ headerShown: false }} />
-      </NavigationGuard>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <NavigationGuard>
+          <Stack screenOptions={{ headerShown: false }} />
+        </NavigationGuard>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

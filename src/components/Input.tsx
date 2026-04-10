@@ -1,15 +1,15 @@
-import { Colors, Fonts } from "@/constants/theme";
-import { useState } from "react";
+import { Fonts } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
+import { useMemo, useState } from "react";
 import {
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   TextInputProps,
   View,
 } from "react-native";
-
 import { Ionicons } from "@expo/vector-icons";
+import type { ThemeColors } from "@/constants/theme";
 
 type Props = TextInputProps & {
   showToggle?: boolean;
@@ -22,6 +22,8 @@ export function Input({
   ...rest
 }: Props) {
   const [visible, setVisible] = useState(false);
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   if (showToggle) {
     return (
@@ -30,6 +32,7 @@ export function Input({
           style={[styles.input, styles.inputWithIcon, style]}
           secureTextEntry={!visible}
           autoCapitalize="none"
+          placeholderTextColor={colors.icon}
           {...rest}
         />
         <Pressable
@@ -39,7 +42,7 @@ export function Input({
           <Ionicons
             name={visible ? "eye-off-outline" : "eye-outline"}
             size={20}
-            color={Colors.icon}
+            color={colors.icon}
           />
         </Pressable>
       </View>
@@ -50,32 +53,36 @@ export function Input({
     <TextInput
       style={[styles.input, style]}
       secureTextEntry={secureTextEntry}
+      placeholderTextColor={colors.icon}
       {...rest}
     />
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  input: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontFamily: Fonts.body.regular,
-    color: Colors.text,
-  },
-  inputWithIcon: {
-    paddingRight: 44,
-  },
-  eyeButton: {
-    position: "absolute",
-    padding: 4,
-    right: 12,
-  },
-});
+function makeStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    input: {
+      width: "100%",
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontFamily: Fonts.body.regular,
+      color: colors.text,
+      backgroundColor: colors.background,
+    },
+    inputWithIcon: {
+      paddingRight: 44,
+    },
+    eyeButton: {
+      position: "absolute",
+      padding: 4,
+      right: 12,
+    },
+  });
+}

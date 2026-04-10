@@ -1,10 +1,11 @@
 import { ActivityCard, ActivityCardData } from "@/components/ActivityCard";
 import { PostCreator } from "@/components/PostCreator";
 import { ProfileBanner } from "@/components/ProfileBanner";
-import { Colors, Fonts } from "@/constants/theme";
+import { Fonts } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import { api } from "@/services/api";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -14,22 +15,30 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import type { ThemeColors } from "@/constants/theme";
 
 type ApiPublicacao = {
   id: number;
+  autorId: number;
   autor: {
     id: number;
     nome: string;
-    foto?: string;
-    avatarUrl?: string;
+    foto?: string | null;
+    avatarUrl?: string | null;
   } | null;
-  autorId: number;
   conteudo: string;
   createdAt: string;
   midia: string | null;
   tipo: string;
   visibilidade: "PUBLICO" | "AMIGOS" | "PRIVADO";
   ativo: boolean;
+};
+
+type ApiAmizade = {
+  id: number;
+  solicitanteId: number;
+  receptorId: number;
+  status: string;
 };
 
 function formatDate(iso: string): string {
@@ -57,37 +66,58 @@ function mapPublicacao(p: ApiPublicacao): ActivityCardData {
 
 export default function InicioScreen() {
   const { usuario } = useAuth();
+  const { colors } = useTheme();
   const usuarioId = usuario?.id;
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
-  const [atividades, setAtividades] = useState<ActivityCardData[]>([]);
+  const [publicacoes, setPublicacoes] = useState<ActivityCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
-  const fetchAtividades = useCallback(async () => {
+  const fetchFeed = useCallback(async () => {
     if (!usuarioId) return;
     try {
       setLoading(true);
       setErro(null);
-      const { data } = await api.get("/publicacoes/minhas");
-      console.log(data);
-      const lista = Array.isArray(data)
-        ? data
-        : Array.isArray(data.dados)
-          ? data.dados
-          : [];
-      setAtividades(lista.map(mapPublicacao));
+
+      const [pubsRes, amizadesRes] = await Promise.all([
+        api.get("/publicacoes?limite=30"),
+        api.get("/amizades?limite=100"),
+      ]);
+
+      const todasPublicacoes: ApiPublicacao[] = Array.isArray(pubsRes.data)
+        ? pubsRes.data
+        : (pubsRes.data.dados ?? []);
+
+      const amizadesData: ApiAmizade[] = Array.isArray(amizadesRes.data)
+        ? amizadesRes.data
+        : (amizadesRes.data.dados ?? []);
+
+      const friendIds = new Set<number>();
+      for (const a of amizadesData) {
+        if (a.solicitanteId === usuarioId) friendIds.add(a.receptorId);
+        else if (a.receptorId === usuarioId) friendIds.add(a.solicitanteId);
+      }
+
+      const feed = todasPublicacoes
+        .filter((p) => p.autorId === usuarioId || friendIds.has(p.autorId))
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+      setPublicacoes(feed.map(mapPublicacao));
     } catch (err) {
-      console.error("[InicioScreen] Erro ao buscar atividades:", err);
-      setErro("Não foi possível carregar as atividades.");
+      console.error("[InicioScreen] Erro ao buscar feed:", err);
+      setErro("Não foi possível carregar o feed.");
     } finally {
       setLoading(false);
     }
   }, [usuarioId]);
 
-  // Só re-busca quando o ID do usuário muda (não a cada refresh de dados do usuário)
   useEffect(() => {
-    fetchAtividades();
-  }, [fetchAtividades]);
+    fetchFeed();
+  }, [fetchFeed]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -100,12 +130,12 @@ export default function InicioScreen() {
 
         <PostCreator />
 
-        <Text style={styles.sectionTitle}>Atividades</Text>
+        <Text style={styles.sectionTitle}>Feed</Text>
 
         {loading && (
           <ActivityIndicator
             style={styles.loader}
-            color={Colors.primary}
+            color={colors.primary}
             size="large"
           />
         )}
@@ -113,19 +143,21 @@ export default function InicioScreen() {
         {!loading && erro && (
           <View style={styles.feedbackContainer}>
             <Text style={styles.feedbackText}>{erro}</Text>
-            <Pressable style={styles.retryButton} onPress={fetchAtividades}>
+            <Pressable style={styles.retryButton} onPress={fetchFeed}>
               <Text style={styles.retryText}>Tentar novamente</Text>
             </Pressable>
           </View>
         )}
 
-        {!loading && !erro && atividades.length === 0 && (
-          <Text style={styles.feedbackText}>Nenhuma atividade encontrada.</Text>
+        {!loading && !erro && publicacoes.length === 0 && (
+          <Text style={styles.feedbackText}>
+            Nenhuma publicação encontrada.{"\n"}Adicione amigos para ver o feed deles!
+          </Text>
         )}
 
         {!loading &&
           !erro &&
-          atividades.map((item) => <ActivityCard key={item.id} data={item} />)}
+          publicacoes.map((item) => <ActivityCard key={item.id} data={item} />)}
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
@@ -133,54 +165,58 @@ export default function InicioScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.white,
-  },
-  scroll: {
-    flex: 1,
-    backgroundColor: Colors.white,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontFamily: Fonts.title.bold,
-    color: Colors.text,
-    marginHorizontal: 16,
-    marginTop: 8,
-    marginBottom: 14,
-  },
-  loader: {
-    marginTop: 24,
-  },
-  feedbackContainer: {
-    alignItems: "center",
-    marginTop: 24,
-    gap: 12,
-  },
-  feedbackText: {
-    textAlign: "center",
-    color: Colors.icon,
-    fontFamily: Fonts.body.regular,
-    fontSize: 14,
-    marginHorizontal: 16,
-  },
-  retryButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.primary,
-  },
-  retryText: {
-    color: Colors.primary,
-    fontFamily: Fonts.title.bold,
-    fontSize: 13,
-  },
-  bottomSpacing: {
-    height: 20,
-  },
-});
+function makeStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
+    sectionTitle: {
+      fontSize: 20,
+      fontFamily: Fonts.title.bold,
+      color: colors.text,
+      marginHorizontal: 16,
+      marginTop: 8,
+      marginBottom: 14,
+    },
+    loader: {
+      marginTop: 24,
+    },
+    feedbackContainer: {
+      alignItems: "center",
+      marginTop: 24,
+      gap: 12,
+    },
+    feedbackText: {
+      textAlign: "center",
+      color: colors.icon,
+      fontFamily: Fonts.body.regular,
+      fontSize: 14,
+      marginTop: 24,
+      marginHorizontal: 16,
+      lineHeight: 22,
+    },
+    retryButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 20,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.primary,
+    },
+    retryText: {
+      color: colors.primary,
+      fontFamily: Fonts.title.bold,
+      fontSize: 13,
+    },
+    bottomSpacing: {
+      height: 20,
+    },
+  });
+}
