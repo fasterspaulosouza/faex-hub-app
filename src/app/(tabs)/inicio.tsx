@@ -2,36 +2,79 @@ import { ActivityCard, ActivityCardData } from "@/components/ActivityCard";
 import { PostCreator } from "@/components/PostCreator";
 import { ProfileBanner } from "@/components/ProfileBanner";
 import { Colors, Fonts } from "@/constants/theme";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import avatarPost from "@/assets/avatar-post.png";
-import avatarImg from "@/assets/avatar.png";
-import post01 from "@/assets/post-01.png";
-import post02 from "@/assets/post-02.png";
 import { useAuth } from "@/context/AuthContext";
+import { api } from "@/services/api";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const MOCK_ACTIVITIES: ActivityCardData[] = [
-  {
-    id: "1",
-    userName: "Felipe Silva",
-    date: "8 de março às 18:00",
-    isPrivate: true,
-    userAvatar: avatarPost,
-    media: post01,
-  },
-  {
-    id: "2",
-    userName: "Felipe Silva",
-    date: "8 de março às 18:00",
-    isPrivate: true,
-    userAvatar: avatarPost,
-    media: post02,
-  },
-];
+type ApiAtividade = {
+  id: number;
+  usuario: {
+    id: number;
+    nome: string;
+    avatarUrl?: string;
+  };
+  criadaEm: string;
+  privada?: boolean;
+  midiaUrl?: string;
+};
+
+function formatDate(iso: string): string {
+  const date = new Date(iso);
+  return date.toLocaleDateString("pt-BR", {
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function mapAtividade(a: ApiAtividade): ActivityCardData {
+  return {
+    id: String(a.id),
+    userName: a.usuario.nome,
+    date: formatDate(a.criadaEm),
+    isPrivate: a.privada,
+    userAvatar: a.usuario.avatarUrl ? { uri: a.usuario.avatarUrl } : undefined,
+    media: a.midiaUrl ? { uri: a.midiaUrl } : undefined,
+  };
+}
 
 export default function InicioScreen() {
-  const { usuario } = useAuth()
-  console.log(usuario)
+  const { usuario } = useAuth();
+  const [atividades, setAtividades] = useState<ActivityCardData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!usuario) return;
+    const usuarioId = usuario.id;
+
+    async function fetchAtividades() {
+      try {
+        setLoading(true);
+        setErro(null);
+        const { data } = await api.get(`/atividades?usuarioId=${usuarioId}`);
+        console.log(data)
+        setAtividades((data.atividades ?? []).map(mapAtividade));
+      } catch {
+        setErro("Não foi possível carregar as atividades.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAtividades();
+  }, [usuario]);
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <ScrollView
@@ -39,11 +82,11 @@ export default function InicioScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Banner de perfil */}
+        {/* Banner de perfil com dados do usuário autenticado */}
         <ProfileBanner
-          name={usuario?.nome || ""}
-          email={usuario?.email || ""}
-          avatar={avatarImg}
+          name={usuario?.nome ?? ""}
+          email={usuario?.email ?? ""}
+          avatar={undefined}
         />
 
         {/* Criador de publicação */}
@@ -52,9 +95,23 @@ export default function InicioScreen() {
         {/* Seção de atividades */}
         <Text style={styles.sectionTitle}>Atividades</Text>
 
-        {MOCK_ACTIVITIES.map((item) => (
-          <ActivityCard key={item.id} data={item} />
-        ))}
+        {loading && (
+          <ActivityIndicator
+            style={styles.loader}
+            color={Colors.primary}
+            size="large"
+          />
+        )}
+
+        {!loading && erro && <Text style={styles.feedbackText}>{erro}</Text>}
+
+        {!loading && !erro && atividades.length === 0 && (
+          <Text style={styles.feedbackText}>Nenhuma atividade encontrada.</Text>
+        )}
+
+        {!loading &&
+          !erro &&
+          atividades.map((item) => <ActivityCard key={item.id} data={item} />)}
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
@@ -74,13 +131,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
-  topHeader: {
-    backgroundColor: Colors.white,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
   sectionTitle: {
     fontSize: 20,
     fontFamily: Fonts.title.bold,
@@ -88,6 +138,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 8,
     marginBottom: 14,
+  },
+  loader: {
+    marginTop: 24,
+  },
+  feedbackText: {
+    textAlign: "center",
+    color: Colors.icon,
+    fontFamily: Fonts.body.regular,
+    fontSize: 14,
+    marginTop: 24,
+    marginHorizontal: 16,
   },
   bottomSpacing: {
     height: 20,

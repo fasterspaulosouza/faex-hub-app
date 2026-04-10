@@ -1,6 +1,7 @@
 import { Colors, Fonts } from "@/constants/theme";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -19,6 +20,7 @@ import { StepIndicator } from "@/components/StepIndicator";
 import RadioGroup from "@/components/RadioGroup";
 import { DateInputField } from "@/components/DateInputField";
 import { Select, SelectOption } from "@/components/Select";
+import { useAuth } from "@/context/AuthContext"
 
 // const SEXO_OPTIONS = ["Masculino", "Feminino"];
 const UF_OPTIONS: SelectOption[] = [
@@ -51,8 +53,45 @@ const UF_OPTIONS: SelectOption[] = [
   { label: "Tocantins", value: "TO" },
 ];
 
+/** Converte "DD/MM/AAAA" para "AAAA-MM-DD" (ISO 8601) */
+function toISODate(dateStr: string): string | undefined {
+  const match = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return undefined;
+  const [, day, month, year] = match;
+  return `${year}-${month}-${day}`;
+}
+
+/** Mapeia valor do RadioGroup ("M"/"F") para o enum do backend */
+function toGenero(value: string): "MASCULINO" | "FEMININO" | undefined {
+  if (value === "M") return "MASCULINO";
+  if (value === "F") return "FEMININO";
+  return undefined;
+}
+
 export default function CadastroScreen() {
+  const { cadastrar } = useAuth();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+    function validarPasso1(): boolean {
+    if (!nome.trim()) {
+      Alert.alert("Atenção", "Informe o nome completo.");
+      return false;
+    }
+    if (!email.trim()) {
+      Alert.alert("Atenção", "Informe o e-mail.");
+      return false;
+    }
+    if (senha.length < 6) {
+      Alert.alert("Atenção", "A senha deve ter no mínimo 6 caracteres.");
+      return false;
+    }
+    if (senha !== confirmarSenha) {
+      Alert.alert("Atenção", "As senhas não coincidem.");
+      return false;
+    }
+    return true;
+  }
 
   // Passo 01
   const [nome, setNome] = useState("");
@@ -97,6 +136,29 @@ export default function CadastroScreen() {
       console.log("Erro ao buscar CEP.");
     } finally {
       setLoadingCep(false);
+    }
+  }
+
+  async function handleFinalizar() {
+    setLoading(true);
+    try {
+      await cadastrar({
+        nome,
+        email,
+        senha,
+        telefone: telefone || undefined,
+        documento: documento.replace(/\D/g, "") || undefined,
+        aniversario: toISODate(dataNascimento),
+        genero: toGenero(sexo),
+      });
+      // NavigationGuard redireciona automaticamente para /(tabs)/inicio
+    } catch (err: any) {
+      const mensagem =
+        err?.response?.data?.message ??
+        "Erro ao realizar cadastro. Tente novamente.";
+      Alert.alert("Erro", Array.isArray(mensagem) ? mensagem.join("\n") : mensagem);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -304,7 +366,7 @@ export default function CadastroScreen() {
               />
 
               <Button label="Voltar" onPress={() => setStep(1)} />
-              <Button label="Finalizar" />
+              <Button label="Finalizar" onPress={handleFinalizar}/>
             </>
           )}
         </View>
